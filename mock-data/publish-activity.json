@@ -1,0 +1,144 @@
+{
+    "data": [
+        {
+            "ApplicationName": "NaeLijAnNaePresents",
+            "VersionID": "12345",
+            "Version": "1.2.45",
+            "PublishDate": "2026-02-27T14:30:00Z",
+            "PublishedBy": "Cactus.Jack",
+            "IsActive": true,
+            "Solution": "Customer Suite"
+        },
+        {
+            "ApplicationName": "NaeLijAnNaePresents",
+            "VersionID": "12344",
+            "Version": "1.2.44",
+            "PublishDate": "2026-02-26T10:15:00Z",
+            "PublishedBy": "jane.smith",
+            "IsActive": true,
+            "Solution": "Customer Suite"
+        },
+        {
+            "ApplicationName": "UserRoleOver",
+            "VersionID": "67890",
+            "Version": "2.1.12",
+            "PublishDate": "2026-02-27T09:45:00Z",
+            "PublishedBy": "Cactus.Jack",
+            "IsActive": true,
+            "Solution": "Order Processing"
+        },
+        {
+            "ApplicationName": "UserRoleOver",
+            "VersionID": "67889",
+            "Version": "2.1.11",
+            "PublishDate": "2026-02-25T16:20:00Z",
+            "PublishedBy": "mike.johnson",
+            "IsActive": true,
+            "Solution": "Order Processing"
+        },
+        {
+            "ApplicationName": "ScabbyCats",
+            "VersionID": "54321",
+            "Version": "3.0.8",
+            "PublishDate": "2026-02-26T13:00:00Z",
+            "PublishedBy": "sarah.williams",
+            "IsActive": true,
+            "Solution": "Inventory Suite"
+        },
+        {
+            "ApplicationName": "NaeLijAnNaePresents",
+            "VersionID": "12343",
+            "Version": "1.2.43",
+            "PublishDate": "2026-02-24T11:30:00Z",
+            "PublishedBy": "Cactus.Jack",
+            "IsActive": true,
+            "Solution": "Customer Suite"
+        },
+        {
+            "ApplicationName": "ClientDeporting",
+            "VersionID": "99999",
+            "Version": "1.5.2",
+            "PublishDate": "2026-02-23T15:45:00Z",
+            "PublishedBy": "jane.smith",
+            "IsActive": true,
+            "Solution": "Analytics"
+        },
+        {
+            "ApplicationName": "UserRoleOver",
+            "VersionID": "67888",
+            "Version": "2.1.10",
+            "PublishDate": "2026-02-23T08:30:00Z",
+            "PublishedBy": "mike.johnson",
+            "IsActive": true,
+            "Solution": "Order Processing"
+        },
+        {
+            "ApplicationName": "ScabbyCats",
+            "VersionID": "54320",
+            "Version": "3.0.7",
+            "PublishDate": "2026-02-22T14:15:00Z",
+            "PublishedBy": "sarah.williams",
+            "IsActive": true,
+            "Solution": "Inventory Suite"
+        },
+        {
+            "ApplicationName": "NaeLijAnNaePresents",
+            "VersionID": "12342",
+            "Version": "1.2.42",
+            "PublishDate": "2026-02-21T10:00:00Z",
+            "PublishedBy": "Cactus.Jack",
+            "IsActive": true,
+            "Solution": "Customer Suite"
+        },
+        {
+            "ApplicationName": "PaymentGateway",
+            "VersionID": "11111",
+            "Version": "4.2.1",
+            "PublishDate": "2026-02-20T16:30:00Z",
+            "PublishedBy": "alex.brown",
+            "IsActive": true,
+            "Solution": "Payment Processing"
+        },
+        {
+            "ApplicationName": "NaeLijAnNaePresents",
+            "VersionID": "12341",
+            "Version": "1.2.41",
+            "PublishDate": "2026-02-19T09:15:00Z",
+            "PublishedBy": "jane.smith",
+            "IsActive": true,
+            "Solution": "Customer Suite"
+        },
+        {
+            "ApplicationName": "UserRoleOver",
+            "VersionID": "67887",
+            "Version": "2.1.9",
+            "PublishDate": "2026-02-18T13:45:00Z",
+            "PublishedBy": "mike.johnson",
+            "IsActive": true,
+            "Solution": "Order Processing"
+        },
+        {
+            "ApplicationName": "ClientDeporting",
+            "VersionID": "99998",
+            "Version": "1.5.1",
+            "PublishDate": "2026-02-17T11:20:00Z",
+            "PublishedBy": "jane.smith",
+            "IsActive": true,
+            "Solution": "Analytics"
+        },
+        {
+            "ApplicationName": "ScabbyCats",
+            "VersionID": "54319",
+            "Version": "3.0.6",
+            "PublishDate": "2026-02-16T15:00:00Z",
+            "PublishedBy": "sarah.williams",
+            "IsActive": true,
+            "Solution": "Inventory Suite"
+        }
+    ],
+    "totalRecords": 15,
+    "dateRange": {
+        "start": "2026-02-16T00:00:00Z",
+        "end": "2026-02-27T23:59:59Z"
+    }
+}

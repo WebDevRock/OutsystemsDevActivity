@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OutSystems Activity Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@3.3.1/cdn.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>OutSystems Activity Dashboard</h1>
+            <p class="subtitle">Development Environment - Publish Activity Analysis</p>
+        </header>
+
+        <!-- Configuration Panel -->
+        <div class="config-panel">
+            <div class="config-section">
+                <label for="api-endpoint">API Endpoint:</label>
+                <input type="text" id="api-endpoint" placeholder="https://your-server/api/activity" value="">
+                <button id="use-mock-data" class="btn-secondary">Use Mock Data</button>
+            </div>
+            <div class="config-section">
+                <label for="days-back">Days Back:</label>
+                <select id="days-back">
+                    <option value="7">Last 7 Days</option>
+                    <option value="30" selected>Last 30 Days</option>
+                    <option value="90">Last 90 Days</option>
+                    <option value="180">Last 180 Days</option>
+                    <option value="365">Last 365 Days</option>
+                </select>
+            </div>
+            <div class="config-section">
+                <label for="app-filter">Application:</label>
+                <select id="app-filter">
+                    <option value="">All Applications</option>
+                </select>
+            </div>
+            <div class="config-section">
+                <button id="load-data" class="btn-primary">Load Data</button>
+                <button id="export-data" class="btn-secondary">Export CSV</button>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Publishes</div>
+                <div class="stat-value" id="stat-total">-</div>
+                <div class="stat-change">Last <span id="stat-days">30</span> days</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Active Applications</div>
+                <div class="stat-value" id="stat-apps">-</div>
+                <div class="stat-change">Tracked applications</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Active Developers</div>
+                <div class="stat-value" id="stat-devs">-</div>
+                <div class="stat-change">Contributing developers</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Avg. Daily Publishes</div>
+                <div class="stat-value" id="stat-avg">-</div>
+                <div class="stat-change">Average activity</div>
+            </div>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loading" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Loading data...</p>
+        </div>
+
+        <!-- Error Message -->
+        <div id="error-message" class="error-message" style="display: none;"></div>
+
+        <!-- Charts Section -->
+        <div class="charts-container">
+            <!-- Daily Activity Trend -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2>Daily Publish Activity</h2>
+                    <p class="chart-description">Number of publishes per day</p>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="daily-activity-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Applications Overview -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2>Top Applications by Publish Count</h2>
+                    <p class="chart-description">Most actively developed applications</p>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="app-overview-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Developer Activity -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2>Developer Activity</h2>
+                    <p class="chart-description">Publish count by developer</p>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="developer-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Activity Heatmap -->
+            <div class="chart-card chart-card-wide">
+                <div class="chart-header">
+                    <h2>Activity Heatmap</h2>
+                    <p class="chart-description">Publishes by day of week and hour</p>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="heatmap-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Timeline Comparison -->
+            <div class="chart-card chart-card-wide">
+                <div class="chart-header">
+                    <h2>Application Timeline Comparison</h2>
+                    <p class="chart-description">Weekly publish trends comparison (Top 5 apps)</p>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="timeline-chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="table-card">
+            <div class="table-header">
+                <h2>Recent Publishes</h2>
+                <div class="table-controls">
+                    <input type="text" id="table-search" placeholder="Search..." class="search-input">
+                    <select id="table-limit" class="table-limit">
+                        <option value="10">Show 10</option>
+                        <option value="25" selected>Show 25</option>
+                        <option value="50">Show 50</option>
+                        <option value="100">Show 100</option>
+                    </select>
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table id="publish-table">
+                    <thead>
+                        <tr>
+                            <th>Application</th>
+                            <th>Version</th>
+                            <th>Published By</th>
+                            <th>Publish Date</th>
+                            <th>Solution</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 2rem;">
+                                No data loaded. Click "Load Data" to begin.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-footer">
+                <div id="table-info">Showing 0 of 0 records</div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>OutSystems Activity Dashboard | Last Updated: <span id="last-update">-</span></p>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/api-service.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
