@@ -38,66 +38,6 @@ const ChartManager = {
     },
 
     /**
-     * Create daily activity chart
-     */
-    createDailyActivityChart(data) {
-        this.destroyChart('daily-activity');
-        
-        const ctx = document.getElementById('daily-activity-chart');
-        if (!ctx) return;
-
-        const labels = data.map(item => item.PublishDate);
-        const counts = data.map(item => item.PublishCount);
-
-        this.charts['daily-activity'] = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Publishes',
-                    data: counts,
-                    borderColor: this.colors.primary,
-                    backgroundColor: this.colors.primary + '20',
-                    tension: 0.4,
-                    fill: true,
-                    pointRadius: 4,
-                    pointHoverRadius: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        callbacks: {
-                            title: (context) => {
-                                return new Date(context[0].label).toLocaleDateString();
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            precision: 0
-                        }
-                    },
-                    x: {
-                        ticks: {
-                            maxRotation: 45,
-                            minRotation: 45
-                        }
-                    }
-                }
-            }
-        });
-    },
-
-    /**
      * Create application overview chart
      */
     createApplicationOverviewChart(data, limit = 10) {
@@ -288,6 +228,8 @@ const ChartManager = {
 
     /**
      * Create timeline comparison chart
+     * @param {Object} weeklyData - Weekly publish data
+     * @param {number|Array} topN - Either number of top apps or array of specific app names
      */
     createTimelineChart(weeklyData, topN = 5) {
         this.destroyChart('timeline');
@@ -298,18 +240,26 @@ const ChartManager = {
         // Get all weeks and sort
         const weeks = Object.keys(weeklyData).sort();
         
-        // Get top N applications by total publishes
-        const appTotals = {};
-        Object.values(weeklyData).forEach(week => {
-            Object.entries(week).forEach(([app, count]) => {
-                appTotals[app] = (appTotals[app] || 0) + count;
-            });
-        });
+        let topApps;
         
-        const topApps = Object.entries(appTotals)
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, topN)
-            .map(([app]) => app);
+        // Check if topN is an array of specific apps or a number
+        if (Array.isArray(topN)) {
+            // Use the provided app names
+            topApps = topN;
+        } else {
+            // Get top N applications by total publishes
+            const appTotals = {};
+            Object.values(weeklyData).forEach(week => {
+                Object.entries(week).forEach(([app, count]) => {
+                    appTotals[app] = (appTotals[app] || 0) + count;
+                });
+            });
+            
+            topApps = Object.entries(appTotals)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, topN)
+                .map(([app]) => app);
+        }
 
         // Create datasets
         const datasets = topApps.map((app, index) => ({

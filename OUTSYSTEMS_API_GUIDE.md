@@ -16,11 +16,16 @@ This document provides examples of how to implement the required REST API endpoi
 
 ### Input Parameters:
 - `DaysBack` (Integer, Optional, Default: 30)
+- `StartDate` (Date, Optional) - Alternative to DaysBack
+- `EndDate` (Date, Optional) - Alternative to DaysBack
 - `Application` (Text, Optional, Default: "")
 
 ### Server Action Logic:
 
 ```sql
+-- Note: Use either DaysBack OR StartDate/EndDate in your query logic
+-- When StartDate and EndDate are provided, use them instead of DaysBack
+
 SELECT 
     e.Name AS ApplicationName,
     CONVERT(VARCHAR, mv.VERSION_ID) AS VersionID,
@@ -38,7 +43,14 @@ LEFT JOIN
 LEFT JOIN
     ossys_Solution ss ON se.SOLUTION_ID = ss.ID
 WHERE 
-    mv.UPLOADED_DATE >= DATEADD(day, -@DaysBack, GETDATE())
+    (
+        -- Use date range if provided
+        (@StartDate IS NOT NULL AND @EndDate IS NOT NULL AND 
+         mv.UPLOADED_DATE >= @StartDate AND mv.UPLOADED_DATE <= @EndDate)
+        OR
+        -- Otherwise use daysBack
+        (@StartDate IS NULL AND mv.UPLOADED_DATE >= DATEADD(day, -@DaysBack, GETDATE()))
+    )
     AND (@Application = '' OR e.Name = @Application)
 ORDER BY 
     mv.UPLOADED_DATE DESC
@@ -125,51 +137,6 @@ In the REST API method:
 
 ---
 
-## Endpoint 3: GetDailySummary
-
-**Method:** GET  
-**Path:** `/daily-summary`
-
-### Input Parameters:
-- `DaysBack` (Integer, Optional, Default: 30)
-
-### Server Action Logic:
-
-```sql
-SELECT 
-    CONVERT(VARCHAR, CAST(mv.UPLOADED_DATE AS DATE), 23) AS PublishDate,
-    COUNT(*) AS PublishCount,
-    COUNT(DISTINCT mv.ESPACE_ID) AS UniqueApplications,
-    COUNT(DISTINCT mv.UPLOADED_BY) AS UniqueDevelopers
-FROM 
-    ossys_Module_Version mv
-WHERE 
-    mv.UPLOADED_DATE >= DATEADD(day, -@DaysBack, GETDATE())
-GROUP BY 
-    CAST(mv.UPLOADED_DATE AS DATE)
-ORDER BY 
-    CAST(mv.UPLOADED_DATE AS DATE) ASC
-```
-
-### Output Structure:
-
-Create a Structure called `DailySummaryRecord`:
-- PublishDate (Text)  # Format: YYYY-MM-DD
-- PublishCount (Integer)
-- UniqueApplications (Integer)
-- UniqueDevelopers (Integer)
-
-Create a Structure called `DailySummaryResponse`:
-- data (List of DailySummaryRecord)
-
-### Response Mapping:
-
-In the REST API method:
-1. Call the Server Action with DaysBack parameter
-2. Assign the result to response.data
-
----
-
 ## CORS Configuration
 
 If your dashboard is hosted separately from your OutSystems server, add these response headers to each REST method:
@@ -239,12 +206,9 @@ ActivityAPI (REST API)
 │   ├── GetPublishActivity (GET /publish-activity)
 │   │   ├── Input: DaysBack, Application
 │   │   └── Output: PublishActivityResponse
-│   ├── GetApplicationList (GET /application-list)
-│   │   ├── Input: None
-│   │   └── Output: ApplicationListResponse
-│   └── GetDailySummary (GET /daily-summary)
-│       ├── Input: DaysBack
-│       └── Output: DailySummaryResponse
+│   └── GetApplicationList (GET /application-list)
+│       ├── Input: None
+│       └── Output: ApplicationListResponse
 └── OnRequest: SetCORSHeaders
 ```
 

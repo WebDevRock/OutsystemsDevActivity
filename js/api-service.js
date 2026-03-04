@@ -47,20 +47,29 @@ const APIService = {
 
     /**
      * Get publish activity data
-     * @param {number} daysBack - Number of days to look back
-     * @param {string} application - Optional application filter
+     * @param {Object} options - Filter options
+     * @param {number} options.daysBack - Number of days to look back (optional)
+     * @param {string} options.startDate - Start date in YYYY-MM-DD format (optional)
+     * @param {string} options.endDate - End date in YYYY-MM-DD format (optional)
+     * @param {string} options.application - Optional application filter
      */
-    async getPublishActivity(daysBack = 30, application = '') {
+    async getPublishActivity(options = {}) {
         if (this.config.useMockData) {
             return this.fetchData(`${this.config.mockDataPath}publish-activity.json`);
         }
         
-        const params = new URLSearchParams({
-            daysBack: daysBack.toString()
-        });
+        const params = new URLSearchParams();
         
-        if (application) {
-            params.append('application', application);
+        // Use either daysBack or date range
+        if (options.daysBack) {
+            params.append('daysBack', options.daysBack.toString());
+        } else if (options.startDate && options.endDate) {
+            params.append('startDate', options.startDate);
+            params.append('endDate', options.endDate);
+        }
+        
+        if (options.application) {
+            params.append('application', options.application);
         }
         
         const url = `${this.config.apiEndpoint}/publish-activity?${params}`;
@@ -76,23 +85,6 @@ const APIService = {
         }
         
         const url = `${this.config.apiEndpoint}/application-list`;
-        return this.fetchData(url);
-    },
-
-    /**
-     * Get daily summary statistics
-     * @param {number} daysBack - Number of days to look back
-     */
-    async getDailySummary(daysBack = 30) {
-        if (this.config.useMockData) {
-            return this.fetchData(`${this.config.mockDataPath}daily-summary.json`);
-        }
-        
-        const params = new URLSearchParams({
-            daysBack: daysBack.toString()
-        });
-        
-        const url = `${this.config.apiEndpoint}/daily-summary?${params}`;
         return this.fetchData(url);
     },
 

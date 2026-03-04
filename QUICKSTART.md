@@ -40,11 +40,10 @@ Connect to your OutSystems environment for real publish data.
 
 ### Step 1: Create OutSystems REST APIs
 
-Follow the guide in [OUTSYSTEMS_API_GUIDE.md](OUTSYSTEMS_API_GUIDE.md) to create three REST endpoints:
+Follow the guide in [OUTSYSTEMS_API_GUIDE.md](OUTSYSTEMS_API_GUIDE.md) to create two REST endpoints:
 
 1. `/publish-activity` - Returns publish records
 2. `/application-list` - Returns application list
-3. `/daily-summary` - Returns daily statistics
 
 **Quick SQL Reference:**
 
@@ -61,12 +60,6 @@ SELECT e.Name, COUNT(*) AS TotalPublishes
 FROM ossys_Espace e
 LEFT JOIN ossys_Module_Version mv ON e.ID = mv.ESPACE_ID
 GROUP BY e.Name
-
--- 3. Daily Summary
-SELECT CAST(mv.UPLOADED_DATE AS DATE) AS Date, COUNT(*) AS Count
-FROM ossys_Module_Version mv
-WHERE mv.UPLOADED_DATE >= DATEADD(day, -30, GETDATE())
-GROUP BY CAST(mv.UPLOADED_DATE AS DATE)
 ```
 
 ### Step 2: Configure CORS (if needed)
@@ -118,9 +111,17 @@ Done! You're now viewing real data! 🎊
 
 ### View Last Week's Activity
 
-1. Select **"Last 7 Days"** from dropdown
-2. Click **"Load Data"**
-3. Review daily activity chart
+1. Select **"Days Back"** mode
+2. Choose **"Last 7 Days"** from dropdown
+3. Click **"Load Data"**
+4. Review activity charts
+
+### Analyze a Specific Time Period
+
+1. Select **"Date Range"** mode from the filter dropdown
+2. Choose your **Start Date** and **End Date**
+3. Click **"Load Data"**
+4. Review statistics for that exact period
 
 ### Focus on One Application
 

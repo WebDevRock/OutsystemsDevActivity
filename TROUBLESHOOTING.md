@@ -113,7 +113,6 @@ Edit files in the `mock-data/` directory to test different scenarios:
 
 - `mock-data/publish-activity.json` - Add more publish records
 - `mock-data/application-list.json` - Add more applications
-- `mock-data/daily-summary.json` - Modify daily statistics
 
 ## Performance Tips
 

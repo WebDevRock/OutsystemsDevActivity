@@ -1,68 +1,68 @@
 {
   "data": [
     {
+      "ID": "6",
+      "ApplicationName": "PaymentGateway",
+      "IsActive": true,
+      "TotalPublishes": 934,
+      "LastPublish": "2026-03-04T16:12:00Z",
+      "FirstPublish": "2025-12-04T08:09:00Z"
+    },
+    {
       "ID": "1",
       "ApplicationName": "CustomerPortal",
       "IsActive": true,
-      "TotalPublishes": 52,
-      "LastPublish": "2026-02-27T14:30:00Z",
-      "FirstPublish": "2025-06-15T09:00:00Z"
+      "TotalPublishes": 899,
+      "LastPublish": "2026-03-04T17:28:00Z",
+      "FirstPublish": "2025-12-04T08:36:00Z"
+    },
+    {
+      "ID": "4",
+      "ApplicationName": "NotificationService",
+      "IsActive": true,
+      "TotalPublishes": 897,
+      "LastPublish": "2026-03-04T17:34:00Z",
+      "FirstPublish": "2025-12-04T10:34:00Z"
+    },
+    {
+      "ID": "7",
+      "ApplicationName": "ReportingEngine",
+      "IsActive": true,
+      "TotalPublishes": 863,
+      "LastPublish": "2026-03-04T17:18:00Z",
+      "FirstPublish": "2025-12-04T08:15:00Z"
     },
     {
       "ID": "2",
-      "ApplicationName": "OrderManagement",
+      "ApplicationName": "DataIntegration",
       "IsActive": true,
-      "TotalPublishes": 48,
-      "LastPublish": "2026-02-27T09:45:00Z",
-      "FirstPublish": "2025-05-20T10:30:00Z"
+      "TotalPublishes": 861,
+      "LastPublish": "2026-03-04T17:42:00Z",
+      "FirstPublish": "2025-12-04T12:55:00Z"
     },
     {
       "ID": "3",
       "ApplicationName": "InventorySystem",
       "IsActive": true,
-      "TotalPublishes": 35,
-      "LastPublish": "2026-02-26T13:00:00Z",
-      "FirstPublish": "2025-07-01T08:15:00Z"
-    },
-    {
-      "ID": "4",
-      "ApplicationName": "ReportingEngine",
-      "IsActive": true,
-      "TotalPublishes": 28,
-      "LastPublish": "2026-02-23T15:45:00Z",
-      "FirstPublish": "2025-08-10T14:00:00Z"
-    },
-    {
-      "ID": "5",
-      "ApplicationName": "PaymentGateway",
-      "IsActive": true,
-      "TotalPublishes": 22,
-      "LastPublish": "2026-02-20T16:30:00Z",
-      "FirstPublish": "2025-09-05T11:20:00Z"
-    },
-    {
-      "ID": "6",
-      "ApplicationName": "UserManagement",
-      "IsActive": true,
-      "TotalPublishes": 19,
-      "LastPublish": "2026-02-15T10:00:00Z",
-      "FirstPublish": "2025-06-25T13:45:00Z"
-    },
-    {
-      "ID": "7",
-      "ApplicationName": "NotificationService",
-      "IsActive": true,
-      "TotalPublishes": 16,
-      "LastPublish": "2026-02-12T15:30:00Z",
-      "FirstPublish": "2025-10-01T09:00:00Z"
+      "TotalPublishes": 846,
+      "LastPublish": "2026-03-04T17:25:00Z",
+      "FirstPublish": "2025-12-04T08:30:00Z"
     },
     {
       "ID": "8",
-      "ApplicationName": "APIGateway",
+      "ApplicationName": "UserManagement",
       "IsActive": true,
-      "TotalPublishes": 14,
-      "LastPublish": "2026-02-10T11:15:00Z",
-      "FirstPublish": "2025-07-15T16:00:00Z"
+      "TotalPublishes": 843,
+      "LastPublish": "2026-03-04T16:00:00Z",
+      "FirstPublish": "2025-12-04T08:38:00Z"
+    },
+    {
+      "ID": "5",
+      "ApplicationName": "OrderManagement",
+      "IsActive": true,
+      "TotalPublishes": 782,
+      "LastPublish": "2026-03-04T17:52:00Z",
+      "FirstPublish": "2025-12-04T09:38:00Z"
     }
   ],
   "totalApplications": 8

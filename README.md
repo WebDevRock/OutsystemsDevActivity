@@ -63,6 +63,9 @@ Returns all publish records.
 
 **Query Parameters:**
 - `daysBack` (optional): Number of days to look back (default: 30)
+  - OR use date range parameters instead:
+- `startDate` (optional): Start date in YYYY-MM-DD format
+- `endDate` (optional): End date in YYYY-MM-DD format
 - `application` (optional): Filter by application name
 
 **Response Format:**
@@ -104,26 +107,6 @@ Returns list of all applications with statistics.
     }
   ],
   "totalApplications": number
-}
-```
-
-### 3. GET /daily-summary
-Returns daily publish counts.
-
-**Query Parameters:**
-- `daysBack` (optional): Number of days to look back (default: 30)
-
-**Response Format:**
-```json
-{
-  "data": [
-    {
-      "PublishDate": "YYYY-MM-DD",
-      "PublishCount": number,
-      "UniqueApplications": number,
-      "UniqueDevelopers": number
-    }
-  ]
 }
 ```
 
@@ -175,23 +158,6 @@ ORDER BY
     e.Name
 ```
 
-**GetDailySummary:**
-```sql
-SELECT 
-    CAST(mv.UPLOADED_DATE AS DATE) AS PublishDate,
-    COUNT(*) AS PublishCount,
-    COUNT(DISTINCT mv.ESPACE_ID) AS UniqueApplications,
-    COUNT(DISTINCT mv.UPLOADED_BY) AS UniqueDevelopers
-FROM 
-    ossys_Module_Version mv
-WHERE 
-    mv.UPLOADED_DATE >= DATEADD(day, -@DaysBack, GETDATE())
-GROUP BY 
-    CAST(mv.UPLOADED_DATE AS DATE)
-ORDER BY 
-    PublishDate ASC
-```
-
 ## Project Structure
 
 ```
@@ -204,8 +170,7 @@ OutsystemsActivity/
 │   └── charts.js          # Chart.js visualization logic
 ├── mock-data/
 │   ├── publish-activity.json
-│   ├── application-list.json
-│   └── daily-summary.json
+│   └── application-list.json
 └── README.md
 ```
 
@@ -215,7 +180,9 @@ OutsystemsActivity/
 
 1. **API Endpoint** - Enter your OutSystems REST API base URL
 2. **Use Mock Data** - Switch to using sample data for testing
-3. **Days Back** - Select how far back to analyze (7, 30, 90, 180, or 365 days)
+3. **Date Filter Mode** - Choose between "Days Back" or "Date Range"
+   - **Days Back** - Select how far back to analyze (7, 30, 90, 180, or 365 days)
+   - **Date Range** - Select custom start and end dates for analysis
 4. **Application Filter** - Filter views to a specific application
 5. **Load Data** - Fetch and display data
 6. **Export CSV** - Download current data as CSV file
@@ -223,12 +190,11 @@ OutsystemsActivity/
 ### Viewing Data
 
 1. **Statistics Cards** - Quick overview of total publishes, applications, developers, and averages
-2. **Daily Activity Chart** - Line chart showing publish count per day
-3. **Application Overview** - Horizontal bar chart of top 10 applications
-4. **Developer Activity** - Horizontal bar chart of top 10 developers
-5. **Activity Heatmap** - Scatter plot showing publish frequency by day/hour
-6. **Timeline Comparison** - Multi-line chart comparing top 5 applications weekly
-7. **Data Table** - Searchable table with ability to show 10, 25, 50, or 100 records
+2. **Application Overview** - Horizontal bar chart of top 10 applications
+3. **Developer Activity** - Horizontal bar chart of top 10 developers
+4. **Activity Heatmap** - Scatter plot showing publish frequency by day/hour
+5. **Timeline Comparison** - Multi-line chart comparing top 5 applications weekly
+6. **Data Table** - Searchable table with ability to show 10, 25, 50, or 100 records
 
 ### Filtering and Searching
 

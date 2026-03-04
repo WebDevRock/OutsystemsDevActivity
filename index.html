@@ -24,6 +24,13 @@
                 <button id="use-mock-data" class="btn-secondary">Use Mock Data</button>
             </div>
             <div class="config-section">
+                <label for="date-mode">Date Filter Mode:</label>
+                <select id="date-mode">
+                    <option value="daysBack" selected>Days Back</option>
+                    <option value="dateRange">Date Range</option>
+                </select>
+            </div>
+            <div class="config-section" id="days-back-section">
                 <label for="days-back">Days Back:</label>
                 <select id="days-back">
                     <option value="7">Last 7 Days</option>
@@ -32,6 +39,14 @@
                     <option value="180">Last 180 Days</option>
                     <option value="365">Last 365 Days</option>
                 </select>
+            </div>
+            <div class="config-section date-range-section" id="date-range-section" style="display: none;">
+                <label for="start-date">Start Date:</label>
+                <input type="date" id="start-date">
+            </div>
+            <div class="config-section date-range-section" id="end-date-section" style="display: none;">
+                <label for="end-date">End Date:</label>
+                <input type="date" id="end-date">
             </div>
             <div class="config-section">
                 <label for="app-filter">Application:</label>
@@ -80,17 +95,6 @@
 
         <!-- Charts Section -->
         <div class="charts-container">
-            <!-- Daily Activity Trend -->
-            <div class="chart-card">
-                <div class="chart-header">
-                    <h2>Daily Publish Activity</h2>
-                    <p class="chart-description">Number of publishes per day</p>
-                </div>
-                <div class="chart-wrapper">
-                    <canvas id="daily-activity-chart"></canvas>
-                </div>
-            </div>
-
             <!-- Applications Overview -->
             <div class="chart-card">
                 <div class="chart-header">
@@ -127,8 +131,18 @@
             <!-- Timeline Comparison -->
             <div class="chart-card chart-card-wide">
                 <div class="chart-header">
-                    <h2>Application Timeline Comparison</h2>
-                    <p class="chart-description">Weekly publish trends comparison (Top 5 apps)</p>
+                    <div class="chart-header-content">
+                        <div>
+                            <h2>Application Timeline Comparison</h2>
+                            <p class="chart-description">Weekly publish trends comparison</p>
+                        </div>
+                        <button id="timeline-config-btn" class="config-btn" title="Configure applications">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M12 1v6m0 6v6m5.2-13.2l-4.2 4.2m0 6l4.2 4.2M23 12h-6m-6 0H1m18.2-5.2l-4.2 4.2m0-6l4.2-4.2"></path>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
                 <div class="chart-wrapper">
                     <canvas id="timeline-chart"></canvas>
@@ -179,6 +193,54 @@
         <footer class="footer">
             <p>OutSystems Activity Dashboard | Last Updated: <span id="last-update">-</span></p>
         </footer>
+    </div>
+
+    <!-- Timeline App Selection Modal -->
+    <div id="timeline-config-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Select Applications for Timeline</h3>
+                <button class="modal-close" id="timeline-modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-description">Select up to 5 applications to compare (default: top 5 by activity)</p>
+                
+                <!-- Selection Counter -->
+                <div class="selection-counter">
+                    <span id="selection-count">0 of 5</span> applications selected
+                </div>
+                
+                <!-- Search Box -->
+                <div class="modal-search">
+                    <input type="text" id="timeline-app-search" placeholder="Search applications..." class="search-input">
+                    <span class="search-hint" id="search-results-count"></span>
+                </div>
+                
+                <!-- Selected Apps Section -->
+                <div id="selected-apps-section" class="selected-apps-section" style="display: none;">
+                    <h4>Currently Selected:</h4>
+                    <div id="selected-apps-list" class="selected-apps-list">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+                
+                <!-- Available Apps List -->
+                <div class="available-apps-section">
+                    <h4>Available Applications:</h4>
+                    <div id="timeline-app-list" class="app-selection-list">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+                
+                <div id="no-results-message" class="no-results-message" style="display: none;">
+                    No applications found matching your search.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="timeline-reset-btn" class="btn-secondary">Reset to Top 5</button>
+                <button id="timeline-apply-btn" class="btn-primary">Apply Selection</button>
+            </div>
+        </div>
     </div>
 
     <!-- Scripts -->

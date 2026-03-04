@@ -7,6 +7,10 @@ class OutSystemsActivityApp {
     constructor() {
         this.currentData = null;
         this.filteredData = null;
+        this.selectedTimelineApps = null; // null means use default top 5
+        this.modalSelectedApps = []; // Currently selected apps in modal
+        this.allApps = []; // All available apps with counts
+        this.currentFilteredApps = null; // Filtered apps based on search
         this.init();
     }
 
@@ -16,10 +20,24 @@ class OutSystemsActivityApp {
     init() {
         this.setupEventListeners();
         this.loadApplicationList();
+        this.initializeDateInputs();
         
         // Load mock data by default
         APIService.useMockData();
         this.showInfo('Using mock data. Click "Load Data" to view charts.');
+    }
+
+    /**
+     * Initialize date inputs with default values
+     */
+    initializeDateInputs() {
+        const today = new Date();
+        const thirtyDaysAgo = new Date(today);
+        thirtyDaysAgo.setDate(today.getDate() - 30);
+        
+        // Set default date range (last 30 days)
+        document.getElementById('end-date').valueAsDate = today;
+        document.getElementById('start-date').valueAsDate = thirtyDaysAgo;
     }
 
     /**
@@ -69,6 +87,68 @@ class OutSystemsActivityApp {
         document.getElementById('days-back').addEventListener('change', (e) => {
             document.getElementById('stat-days').textContent = e.target.value;
         });
+
+        // Date mode selector
+        document.getElementById('date-mode').addEventListener('change', (e) => {
+            this.toggleDateMode(e.target.value);
+        });
+
+        // Timeline configuration modal
+        document.getElementById('timeline-config-btn').addEventListener('click', () => {
+            this.showTimelineConfigModal();
+        });
+
+        document.getElementById('timeline-modal-close').addEventListener('click', () => {
+            this.hideTimelineConfigModal();
+        });
+
+        document.getElementById('timeline-config-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'timeline-config-modal') {
+                this.hideTimelineConfigModal();
+            }
+        });
+
+        document.getElementById('timeline-apply-btn').addEventListener('click', () => {
+            this.applyTimelineSelection();
+        });
+
+        document.getElementById('timeline-reset-btn').addEventListener('click', () => {
+            this.resetTimelineSelection();
+        });
+
+        // Close modal on ESC key
+        document.addEventListener('keydown', (e) => {
+            const modal = document.getElementById('timeline-config-modal');
+            const isModalOpen = modal.style.display === 'flex';
+            
+            if (!isModalOpen) return;
+            
+            if (e.key === 'Escape') {
+                this.hideTimelineConfigModal();
+            } else if (e.key === 'Enter' && e.target.id !== 'timeline-app-search') {
+                // Apply selection on Enter (unless typing in search box)
+                this.applyTimelineSelection();
+            }
+        });
+    }
+
+    /**
+     * Toggle between days back and date range modes
+     */
+    toggleDateMode(mode) {
+        const daysBackSection = document.getElementById('days-back-section');
+        const dateRangeSection = document.getElementById('date-range-section');
+        const endDateSection = document.getElementById('end-date-section');
+        
+        if (mode === 'dateRange') {
+            daysBackSection.style.display = 'none';
+            dateRangeSection.style.display = 'flex';
+            endDateSection.style.display = 'flex';
+        } else {
+            daysBackSection.style.display = 'flex';
+            dateRangeSection.style.display = 'none';
+            endDateSection.style.display = 'none';
+        }
     }
 
     /**
@@ -98,32 +178,46 @@ class OutSystemsActivityApp {
         this.hideError();
         
         try {
-            const daysBack = parseInt(document.getElementById('days-back').value);
+            const dateMode = document.getElementById('date-mode').value;
             const application = document.getElementById('app-filter').value;
             
-            // Fetch all data
-            const [activityResult, summaryResult] = await Promise.all([
-                APIService.getPublishActivity(daysBack, application),
-                APIService.getDailySummary(daysBack)
-            ]);
+            // Prepare API options based on date mode
+            const options = { application };
+            
+            if (dateMode === 'dateRange') {
+                const startDate = document.getElementById('start-date').value;
+                const endDate = document.getElementById('end-date').value;
+                
+                if (!startDate || !endDate) {
+                    throw new Error('Please select both start and end dates');
+                }
+                
+                if (new Date(startDate) > new Date(endDate)) {
+                    throw new Error('Start date must be before end date');
+                }
+                
+                options.startDate = startDate;
+                options.endDate = endDate;
+            } else {
+                const daysBack = parseInt(document.getElementById('days-back').value);
+                options.daysBack = daysBack;
+            }
+            
+            // Fetch data
+            const activityResult = await APIService.getPublishActivity(options);
 
             if (!activityResult.success) {
                 throw new Error(activityResult.error);
             }
 
-            if (!summaryResult.success) {
-                throw new Error(summaryResult.error);
-            }
-
             this.currentData = activityResult.data.data;
             this.filteredData = this.currentData;
-            const dailySummary = summaryResult.data.data;
 
             // Update statistics
-            this.updateStats(daysBack);
+            this.updateStats();
 
             // Create all charts
-            this.createAllCharts(dailySummary);
+            this.createAllCharts();
 
             // Update table
             this.updateTable();
@@ -144,14 +238,11 @@ class OutSystemsActivityApp {
     /**
      * Create all charts
      */
-    createAllCharts(dailySummary) {
+    createAllCharts() {
         if (!this.currentData || this.currentData.length === 0) {
             this.showError('No data available to display charts.');
             return;
         }
-
-        // Daily activity chart
-        ChartManager.createDailyActivityChart(dailySummary);
 
         // Application overview
         const byApp = APIService.processData.byApplication(this.currentData);
@@ -165,16 +256,31 @@ class OutSystemsActivityApp {
         const heatmapData = APIService.processData.byDayAndHour(this.currentData);
         ChartManager.createHeatmapChart(heatmapData);
 
-        // Timeline comparison
+        // Timeline comparison - use selected apps or default top 5
         const weeklyData = APIService.processData.byWeek(this.currentData);
-        ChartManager.createTimelineChart(weeklyData, 5);
+        if (this.selectedTimelineApps) {
+            ChartManager.createTimelineChart(weeklyData, this.selectedTimelineApps);
+        } else {
+            ChartManager.createTimelineChart(weeklyData, 5);
+        }
     }
 
     /**
      * Update statistics cards
      */
-    updateStats(daysBack) {
+    updateStats() {
         if (!this.currentData) return;
+
+        const dateMode = document.getElementById('date-mode').value;
+        let daysBack = 30;
+        
+        if (dateMode === 'dateRange') {
+            const startDate = new Date(document.getElementById('start-date').value);
+            const endDate = new Date(document.getElementById('end-date').value);
+            daysBack = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+        } else {
+            daysBack = parseInt(document.getElementById('days-back').value);
+        }
 
         const stats = APIService.processData.calculateStats(this.currentData, daysBack);
 
@@ -182,6 +288,7 @@ class OutSystemsActivityApp {
         document.getElementById('stat-apps').textContent = stats.uniqueApplications;
         document.getElementById('stat-devs').textContent = stats.uniqueDevelopers;
         document.getElementById('stat-avg').textContent = stats.averageDaily;
+        document.getElementById('stat-days').textContent = daysBack;
     }
 
     /**
@@ -268,6 +375,228 @@ class OutSystemsActivityApp {
      */
     filterTable(searchTerm) {
         this.updateTable();
+    }
+
+    /**
+     * Show timeline configuration modal
+     */
+    showTimelineConfigModal() {
+        if (!this.currentData) {
+            this.showError('Please load data first.');
+            return;
+        }
+
+        // Get all applications with their publish counts
+        const appData = APIService.processData.byApplication(this.currentData);
+        // appData is an array of { name, count, publishes } objects
+        this.allApps = appData.map(item => ({ app: item.name, count: item.count }));
+
+        // Get top 5 for default
+        const top5Apps = this.allApps.slice(0, 5).map(item => item.app);
+        const currentSelection = this.selectedTimelineApps || top5Apps;
+        
+        // Store current selection for the modal
+        this.modalSelectedApps = [...currentSelection];
+
+        // Render the modal content
+        this.renderTimelineAppList();
+
+        // Add search listener
+        const searchInput = document.getElementById('timeline-app-search');
+        searchInput.value = '';
+        searchInput.addEventListener('input', (e) => {
+            this.filterTimelineApps(e.target.value);
+        });
+
+        // Show modal
+        document.getElementById('timeline-config-modal').style.display = 'flex';
+        
+        // Focus search input
+        setTimeout(() => searchInput.focus(), 100);
+    }
+
+    /**
+     * Render the timeline app list with current filters
+     */
+    renderTimelineAppList(filteredApps = null) {
+        const appsToShow = filteredApps || this.allApps;
+        const appListContainer = document.getElementById('timeline-app-list');
+        const selectedSection = document.getElementById('selected-apps-section');
+        const selectedListContainer = document.getElementById('selected-apps-list');
+        const noResultsMessage = document.getElementById('no-results-message');
+        const searchResultsCount = document.getElementById('search-results-count');
+
+        // Update counter
+        this.updateSelectionCounter();
+
+        // Render selected apps badges
+        if (this.modalSelectedApps.length > 0) {
+            selectedSection.style.display = 'block';
+            selectedListContainer.innerHTML = '';
+            
+            this.modalSelectedApps.forEach(app => {
+                const appName = String(app || '');
+                const badge = document.createElement('div');
+                badge.className = 'selected-app-badge';
+                badge.innerHTML = `
+                    ${this.escapeHtml(appName)}
+                    <button data-app="${this.escapeHtml(appName)}" title="Remove">&times;</button>
+                `;
+                
+                // Remove button handler
+                badge.querySelector('button').addEventListener('click', (e) => {
+                    this.toggleAppSelection(e.target.dataset.app, false);
+                });
+                
+                selectedListContainer.appendChild(badge);
+            });
+        } else {
+            selectedSection.style.display = 'none';
+        }
+
+        // Clear and populate available apps list
+        appListContainer.innerHTML = '';
+
+        if (appsToShow.length === 0) {
+            noResultsMessage.style.display = 'block';
+            appListContainer.style.display = 'none';
+            searchResultsCount.textContent = '';
+        } else {
+            noResultsMessage.style.display = 'none';
+            appListContainer.style.display = 'flex';
+            
+            if (filteredApps) {
+                searchResultsCount.textContent = `Showing ${appsToShow.length} of ${this.allApps.length} applications`;
+            } else {
+                searchResultsCount.textContent = '';
+            }
+
+            appsToShow.forEach(({ app, count }) => {
+                // Ensure app is a string
+                const appName = String(app || '');
+                const isSelected = this.modalSelectedApps.includes(appName);
+                const div = document.createElement('div');
+                div.className = `app-selection-item ${isSelected ? 'selected' : ''}`;
+                div.dataset.app = appName;
+                
+                div.innerHTML = `
+                    <input type="checkbox" id="app-${this.escapeHtml(appName)}" ${isSelected ? 'checked' : ''} data-app="${this.escapeHtml(appName)}">
+                    <label for="app-${this.escapeHtml(appName)}">
+                        <span class="app-selection-name">${this.escapeHtml(appName)}</span>
+                        <span class="app-selection-count">${count} publishes</span>
+                    </label>
+                `;
+
+                // Add change listener
+                const checkbox = div.querySelector('input');
+                checkbox.addEventListener('change', (e) => {
+                    this.toggleAppSelection(e.target.dataset.app, e.target.checked);
+                });
+
+                appListContainer.appendChild(div);
+            });
+        }
+    }
+
+    /**
+     * Toggle app selection
+     */
+    toggleAppSelection(app, isSelected) {
+        if (isSelected) {
+            if (this.modalSelectedApps.length >= 5) {
+                this.showError('You can select a maximum of 5 applications.');
+                this.renderTimelineAppList(this.currentFilteredApps);
+                return;
+            }
+            this.modalSelectedApps.push(app);
+        } else {
+            this.modalSelectedApps = this.modalSelectedApps.filter(a => a !== app);
+        }
+        
+        this.renderTimelineAppList(this.currentFilteredApps);
+    }
+
+    /**
+     * Update selection counter
+     */
+    updateSelectionCounter() {
+        const counter = document.getElementById('selection-count');
+        const count = this.modalSelectedApps.length;
+        counter.textContent = `${count} of 5`;
+        counter.parentElement.style.borderColor = count === 5 ? 'var(--warning-color)' : 'var(--border-color)';
+    }
+
+    /**
+     * Filter timeline apps by search term
+     */
+    filterTimelineApps(searchTerm) {
+        const term = searchTerm.toLowerCase().trim();
+        
+        if (!term) {
+            this.currentFilteredApps = null;
+            this.renderTimelineAppList();
+            return;
+        }
+
+        const filtered = this.allApps.filter(({ app }) => 
+            app.toLowerCase().includes(term)
+        );
+        
+        this.currentFilteredApps = filtered;
+        this.renderTimelineAppList(filtered);
+    }
+
+    /**
+     * Hide timeline configuration modal
+     */
+    hideTimelineConfigModal() {
+        document.getElementById('timeline-config-modal').style.display = 'none';
+        
+        // Clean up
+        const searchInput = document.getElementById('timeline-app-search');
+        searchInput.value = '';
+        this.currentFilteredApps = null;
+        
+        // Remove event listener by cloning the element
+        const newSearchInput = searchInput.cloneNode(true);
+        searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+    }
+
+    /**
+     * Apply timeline app selection
+     */
+    applyTimelineSelection() {
+        if (this.modalSelectedApps.length === 0) {
+            this.showError('Please select at least one application.');
+            return;
+        }
+
+        this.selectedTimelineApps = [...this.modalSelectedApps];
+        this.hideTimelineConfigModal();
+
+        // Refresh the timeline chart
+        if (this.currentData) {
+            const weeklyData = APIService.processData.byWeek(this.currentData);
+            ChartManager.createTimelineChart(weeklyData, this.selectedTimelineApps);
+        }
+
+        this.showInfo(`Timeline updated with ${this.selectedTimelineApps.length} application(s).`);
+    }
+
+    /**
+     * Reset timeline selection to top 5
+     */
+    resetTimelineSelection() {
+        this.selectedTimelineApps = null;
+        this.hideTimelineConfigModal();
+
+        // Refresh the timeline chart with default top 5
+        if (this.currentData) {
+            const weeklyData = APIService.processData.byWeek(this.currentData);
+            ChartManager.createTimelineChart(weeklyData, 5);
+        }
+
+        this.showInfo('Timeline reset to top 5 applications.');
     }
 
     /**
@@ -360,8 +689,13 @@ class OutSystemsActivityApp {
      * Escape HTML to prevent XSS
      */
     escapeHtml(text) {
+        if (text === null || text === undefined) {
+            return '';
+        }
+        // Convert to string if not already
+        const str = String(text);
         const div = document.createElement('div');
-        div.textContent = text;
+        div.textContent = str;
         return div.innerHTML;
     }
 }
