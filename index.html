@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OutSystems Activity Dashboard</title>
+    <title>OutSystems Delivery Insights</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/date-fns@3.3.1/cdn.min.js"></script>
@@ -12,8 +12,8 @@
     <div class="container">
         <!-- Header -->
         <header class="header">
-            <h1>OutSystems Activity Dashboard</h1>
-            <p class="subtitle">Development Environment - Publish Activity Analysis</p>
+            <h1>OutSystems Delivery Insights</h1>
+            <p class="subtitle">Development Environment – Publish Activity Trends</p>
         </header>
 
         <!-- Configuration Panel -->
@@ -63,7 +63,7 @@
         <!-- Stats Cards -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-label">Total Publishes</div>
+                <div class="stat-label">Total Platform Publishes</div>
                 <div class="stat-value" id="stat-total">-</div>
                 <div class="stat-change">Last <span id="stat-days">30</span> days</div>
             </div>
@@ -73,12 +73,12 @@
                 <div class="stat-change">Tracked applications</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Active Developers</div>
+                <div class="stat-label">Developers with Publish Activity</div>
                 <div class="stat-value" id="stat-devs">-</div>
                 <div class="stat-change">Contributing developers</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Avg. Daily Publishes</div>
+                <div class="stat-label">Average Daily Publish Events</div>
                 <div class="stat-value" id="stat-avg">-</div>
                 <div class="stat-change">Average activity</div>
             </div>
@@ -98,7 +98,7 @@
             <!-- Applications Overview -->
             <div class="chart-card">
                 <div class="chart-header">
-                    <h2>Top Applications by Publish Count</h2>
+                    <h2>Applications with Highest Publish Activity</h2>
                     <p class="chart-description">Most actively developed applications</p>
                 </div>
                 <div class="chart-wrapper">
@@ -109,7 +109,7 @@
             <!-- Developer Activity -->
             <div class="chart-card">
                 <div class="chart-header">
-                    <h2>Developer Activity</h2>
+                    <h2>Publish Distribution by Developer</h2>
                     <p class="chart-description">Publish count by developer</p>
                 </div>
                 <div class="chart-wrapper">
@@ -120,7 +120,7 @@
             <!-- Activity Heatmap -->
             <div class="chart-card chart-card-wide">
                 <div class="chart-header">
-                    <h2>Activity Heatmap</h2>
+                    <h2>Publish Activity Heatmap</h2>
                     <p class="chart-description">Publishes by day of week and hour</p>
                 </div>
                 <div class="chart-wrapper">
@@ -133,7 +133,7 @@
                 <div class="chart-header">
                     <div class="chart-header-content">
                         <div>
-                            <h2>Application Timeline Comparison</h2>
+                            <h2>Application Publish Activity Over Time</h2>
                             <p class="chart-description">Weekly publish trends comparison</p>
                         </div>
                         <button id="timeline-config-btn" class="config-btn" title="Configure applications">
@@ -191,7 +191,7 @@
 
         <!-- Footer -->
         <footer class="footer">
-            <p>OutSystems Activity Dashboard | Last Updated: <span id="last-update">-</span></p>
+            <p>OutSystems Delivery Insights | Last Updated: <span id="last-update">-</span></p>
         </footer>
     </div>
 
